@@ -1,0 +1,18 @@
+name: dina
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - black>=21.12b0
+  - boken>=2.4.2
+  - ipython>=8.0.0
+  - jupyter>=1.0.0
+  - jupyterlab>=3.2.8
+  - matplotlib>=3.5.1
+  - notebook>=6.4.7
+  - numpy>=1.22.0
+  - openpyxl>=3.0.9
+  - pandas>=1.3.5
+  - pip>=21.3.1
+  - python>=3.10.2
+  - setuptools>=59.8.0
