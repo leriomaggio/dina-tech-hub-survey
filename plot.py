@@ -1,4 +1,4 @@
-from typing import Union, Callable
+from typing import Union
 import matplotlib.pyplot as plt
 import pandas as pd
 
