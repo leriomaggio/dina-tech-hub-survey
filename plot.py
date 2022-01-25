@@ -194,11 +194,12 @@ def bar_plot(
             alpha=alpha,
             title=title,
             rot=ticks_rotation,
+            fontsize="x-large",
         )
         xticks_labels = ["\n".join(wrap(l, wrapping)) for l in df_chart.index.values]
         ax.set_xticks(range(len(xticks_labels)), labels=xticks_labels)
         if axis_label:
-            ax.set_xlabel(axis_label)
+            ax.set_xlabel(axis_label, fontsize="x-large")
     else:
         ax = df_chart.plot.barh(
             figsize=figsize,
@@ -207,11 +208,12 @@ def bar_plot(
             alpha=alpha,
             title=title,
             rot=ticks_rotation,
+            fontsize="x-large",
         )
         yticks_labels = ["\n".join(wrap(l, wrapping)) for l in df_chart.index.values]
         ax.set_yticks(range(len(yticks_labels)), labels=yticks_labels)
         if axis_label:
-            ax.set_ylabel(axis_label)
+            ax.set_ylabel(axis_label, fontsize="x-large")
 
     if legend and isinstance(columns, list):
         # adding legend only if more than one column is being selected
@@ -223,7 +225,7 @@ def bar_plot(
         labels = [
             str(int(value)) if value > 0 else "" for value in container.datavalues
         ]
-        ax.bar_label(container, labels=labels)
+        ax.bar_label(container, labels=labels, fontsize="x-large")
 
     if value_lim is not None:
         if horizontal:
