@@ -250,6 +250,7 @@ def heatmap_co_occurrence(
     wrapping: int = 15,
     xticks_rot: int = 0,
     yticks_rot: int = 0,
+    filename: str = None,
 ) -> None:
     co_occurrence_mat = np.dot(data, data.T)
     co_occurrence_mat[np.diag_indices_from(co_occurrence_mat)] = 0
@@ -264,4 +265,13 @@ def heatmap_co_occurrence(
     )
     plt.xticks(rotation=xticks_rot)
     plt.yticks(rotation=yticks_rot)
-    plt.show()
+
+    if filename:
+        chart_filepath = CHART_FOLDER / filename
+        if not filename.endswith(".pdf"):
+            filename += ".pdf"
+        plt.savefig(
+            chart_filepath, dpi=1200, format="pdf", pad_inches=0.5, bbox_inches="tight"
+        )
+    else:
+        plt.show()
