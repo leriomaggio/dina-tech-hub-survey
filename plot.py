@@ -1,12 +1,18 @@
+from multiprocessing.dummy import Array
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
+import seaborn as sns
 
 from typing import Union
+from numpy.typing import ArrayLike
 from itertools import filterfalse
 
 # Chart Data Folder
 from pathlib import Path
+
+from textwrap import wrap
 
 CHART_FOLDER = Path(os.path.join(os.path.abspath(os.path.dirname(__file__)), "charts"))
 if not os.path.exists(CHART_FOLDER):
@@ -25,9 +31,13 @@ def bar_plot(
     aggregate: str = "value_counts",
     groupby_cols: list[str] = None,
     sorted: str = "index",
-    cap_threshold: int = 0,
     legend: bool = True,
+    legend_loc: tuple[int, int] = None,
+    legend_col: int = None,
     ticks_rotation=0,
+    axis_label: str = None,
+    value_lim: int = None,
+    wrapping: int = 20,
     figsize: tuple[int] = (12, 6),
     width: float = 0.5,
     alpha: float = 0.5,
@@ -67,14 +77,26 @@ def bar_plot(
         If any groupby column won't be found in the input dataframe, an exception will be raised.
     sorted : str, optional
         Determines whether data should be sorted. Accepted sorting criteria are "index" (default), "value", or None (No sorting).
-    cap_threshold: int, optional
-        If provided, any value (or count) below the threshold will be dropped from the plot. Zero by default
     legend : bool, optional
         Optional parameter to control whether a legend should be added to the barplot. If True (default), a legend will be added
         only if more than one column (series) of data was selected. No legend will be added otherwise. Conversely, if this parameter
         is passed to as False, no legend will be added, regardless.
+    legend_loc: tuple[int, int], optional
+        If legend=True, this parameter will determine the location of the legend. Ignored otherwise. If not provided, legend will be shown according to the type of bar plot (i.e. horizontal=True|False)
+    legend_col: int, optional
+        if legend=True, this parameter will control the number of columns
+        of the chart legend. Ignored otherwise.
+        Default values are 3 for bar plot, and 1 for barh.
     ticks_rotation : int, optional
         Parameter to control the (degrees of) rotation of ticks on the x-axis, by default 0
+    axis_label: str, optional
+        If provided, this parameter will be used as label for the x-axis (y-axis if horizontal=True). Otherwise the
+        name of the corresponding column in the dataframe will be used instead (default).
+    value_lim: int, optional
+        If provided, this value will set the limit of the x (or y) axis depending on whether the
+        bar plot is vertical or not.
+    wrapping: int, optional
+        Parameter to control spacing of ticks in the barplot, 20 by default.
     figsize : tuple[int], optional
         Size of the generated Matplotlib figure, by default (12, 6)
     width : float, optional
@@ -96,6 +118,18 @@ def bar_plot(
     """
     if columns is None or not len(columns):
         columns = df.columns
+
+    if legend_loc is None:
+        if not horizontal:
+            legend_loc = (0, 1.1)
+        else:
+            legend_loc = (1, 0)
+
+    if legend_col is None:
+        if not horizontal:
+            legend_col = 3
+        else:
+            legend_col = 1
 
     if any([col not in df.columns for col in columns]):
         not_found = list(filterfalse(lambda c: c in df.columns, columns))
@@ -137,12 +171,6 @@ def bar_plot(
     agg = getattr(df_chart, aggregate)
     df_chart = agg()
 
-    if cap_threshold:
-        df_chart = df_chart[df_chart > cap_threshold]
-        df_chart.fillna(0, inplace=True)
-        if groupby_cols:
-            df_chart = df_chart.loc[:, (df_chart != 0).any(axis=0)]
-
     if sorted is not None:
         if sorted == "index":
             df_chart = df_chart.sort_index()
@@ -154,9 +182,10 @@ def bar_plot(
             else:
                 df_chart = df_chart.sort_values(ascending=False)
 
-    if len(columns) > 1 and unstack_ord is not None:
+    if isinstance(columns, list) and unstack_ord is not None:
         for idx in unstack_ord:
             df_chart = df_chart.unstack(idx)
+
     if not horizontal:
         ax = df_chart.plot.bar(
             figsize=figsize,
@@ -166,6 +195,10 @@ def bar_plot(
             title=title,
             rot=ticks_rotation,
         )
+        xticks_labels = ["\n".join(wrap(l, wrapping)) for l in df_chart.index.values]
+        ax.set_xticks(range(len(xticks_labels)), labels=xticks_labels)
+        if axis_label:
+            ax.set_xlabel(axis_label)
     else:
         ax = df_chart.plot.barh(
             figsize=figsize,
@@ -175,19 +208,28 @@ def bar_plot(
             title=title,
             rot=ticks_rotation,
         )
+        yticks_labels = ["\n".join(wrap(l, wrapping)) for l in df_chart.index.values]
+        ax.set_yticks(range(len(yticks_labels)), labels=yticks_labels)
+        if axis_label:
+            ax.set_ylabel(axis_label)
 
-    if (
-        legend and len(columns) > 1
-    ):  # adding legend only if more than one column is being selected
-        if not horizontal:
-            plt.legend(ncol=3, loc=(0, 1.1))
-        else:
-            plt.legend(loc=(1, 0))
+    if legend and isinstance(columns, list):
+        # adding legend only if more than one column is being selected
+        plt.legend(ncol=legend_col, loc=legend_loc)
+    elif not legend:
+        ax.legend().set_visible(False)
+
     for container in ax.containers:
         labels = [
             str(int(value)) if value > 0 else "" for value in container.datavalues
         ]
         ax.bar_label(container, labels=labels)
+
+    if value_lim is not None:
+        if horizontal:
+            ax.set_xlim(0, abs(value_lim))
+        else:
+            ax.set_ylim(0, abs(value_lim))
 
     if filename:
         chart_filepath = CHART_FOLDER / filename
@@ -198,3 +240,28 @@ def bar_plot(
         )
     else:
         plt.show()
+
+
+def heatmap_co_occurrence(
+    data: ArrayLike,
+    labels: tuple[str],
+    figsize: tuple[int, int] = (10, 10),
+    colors: str = "Greens",
+    wrapping: int = 15,
+    xticks_rot: int = 0,
+    yticks_rot: int = 0,
+) -> None:
+    co_occurrence_mat = np.dot(data, data.T)
+    co_occurrence_mat[np.diag_indices_from(co_occurrence_mat)] = 0
+
+    plt.figure(figsize=figsize)
+    sns.heatmap(
+        co_occurrence_mat,
+        annot=True,
+        xticklabels=["\n".join(wrap(l, wrapping)) for l in labels],
+        yticklabels=["\n".join(wrap(l, wrapping)) for l in labels],
+        cmap=colors,
+    )
+    plt.xticks(rotation=xticks_rot)
+    plt.yticks(rotation=yticks_rot)
+    plt.show()
