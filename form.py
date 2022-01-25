@@ -87,7 +87,7 @@ SALARY_GAP = (
 
 # == Women Section
 # ----------------
-W_DISCRIMIATION_QUESTION = "Ti sei sentita discriminata, ostacolata, o messa in difficoltà nel tuo percorso di studi/carriera? Ti chiedo di pensare a situazioni, ostacoli e difficoltà che ti si presentano in particolare in quanto donna. "
+W_DISCRIMINATION_QUESTION = "Ti sei sentita discriminata, ostacolata, o messa in difficoltà nel tuo percorso di studi/carriera?"
 W_DISCRIMINATION = (
     "no",
     "un po', ma facilmente superabile",
@@ -110,7 +110,7 @@ W_EXPERIENCE = (
     "nessuna delle precedenti",
 )
 
-W_SUPPORT_QUESTION = "C’è qualcosa che pensi ti avrebbe potuto aiutare? Per esempio, 'sarebbe stato più facile se avessi saputo prima che...', o 'sarebbe stato più facile se ci fosse stata questa situazione...'"
+W_SUPPORT_QUESTION = "C’è qualcosa che pensi ti avrebbe potuto aiutare?"
 W_SUPPORT = (
     "supporto da parte dei colleghi maschi",
     "supporto da parte delle colleghe donne",
@@ -124,7 +124,7 @@ W_SUPPORT = (
 
 # == Men Section
 # --------------
-M_DISCRIMINATION_QUESTION = "Credi che le donne che fanno il tuo stesso lavoro/percorsi di studi, incontrino ostacoli, discriminazioni, situazioni di difficoltà? Ti chiedo di pensare a situazioni, ostacoli e difficoltà che si possono presentare in particolare alle donne in quanto tali."
+M_DISCRIMINATION_QUESTION = "Credi che le donne che fanno il tuo stesso lavoro/percorsi di studi, incontrino ostacoli, discriminazioni, situazioni di difficoltà?"
 
 M_DISCRIMINATION = (
     "no",
@@ -133,7 +133,7 @@ M_DISCRIMINATION = (
     "talmente tanto che molte desistitono e cambiano lavoro/carriera",
 )
 
-M_EXPERIENCE_QUESTION = "Alle donne che lavorano nel tuo settore secondo te sono successe situazioni come quelle sotto (o magari le hai viste succedere tu stesso)?"
+M_EXPERIENCE_QUESTION = "Alle donne che lavorano nel tuo settore secondo te sono successe situazioni come quelle sotto?"
 
 M_EXPERIENCE = (
     "difficoltà di relazione con la maggioranza di colleghi maschi",
